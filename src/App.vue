@@ -1,4 +1,4 @@
-<script setup>
+<!-- <script setup>
 // 1. Reactive State
 import ReactiveRef from './components/practices/composition/ReactiveRef.vue'
 import ReactiveReactive from './components/practices/composition/ReactiveReactive.vue'
@@ -54,4 +54,23 @@ import SlotScopedParent from '@/components/practices/component/SlotScopedParent.
 <style>
 /* ⚠️ 외부 스타일 파일(예: 버튼 디자인 뭉치)을 이 방 안으로 쏙 가리켜 가져옵니다 */
 @import '@/assets/practice.css';
+</style>
+-->
+
+<script setup>
+// 새로 만든 WeatherParent 컴포넌트 불러오기
+import WeatherParent from './components/exercise/WeatherParent.vue'
+</script>
+
+<template>
+  <main>
+    <!-- 화면에 컴포넌트 띄우기 -->
+    <WeatherParent />
+  </main>
+</template>
+
+<style scoped>
+main {
+  padding: 20px;
+}
 </style>

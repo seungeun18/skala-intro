@@ -12,13 +12,13 @@ import WatchersRefArray from './components/practices/composition/WatchersRefArra
 import WatchersReactiveArray from './components/practices/composition/WatchersReactiveArray.vue'
 import WatchersWatchEffect from './components/practices/composition/WatchersWatchEffect.vue'
 // 3. Component Lifecycle
-//import LifecycleParent from '@/components/practices/component/LifecycleParent.vue'
+import LifecycleParent from '@/components/practices/component/LifecycleParent.vue'
 // 4. Props & Emits
-// import PropsEmitsParent from '@/components/practices/component/PropsEmitsParent.vue'
+import PropsEmitsParent from '@/components/practices/component/PropsEmitsParent.vue'
 // 5. Component Slot
-// import SlotDefaultParent from '@/components/practices/component/SlotDefaultParent.vue'
-// import SlotNamedParent from '@/components/practices/component/SlotNamedParent.vue'
-// import SlotScopedParent from '@/components/practices/component/SlotScopedParent.vue'
+import SlotDefaultParent from '@/components/practices/component/SlotDefaultParent.vue'
+import SlotNamedParent from '@/components/practices/component/SlotNamedParent.vue'
+import SlotScopedParent from '@/components/practices/component/SlotScopedParent.vue'
 </script>
 
 <template>
@@ -39,7 +39,7 @@ import WatchersWatchEffect from './components/practices/composition/WatchersWatc
     <WatchersWatchEffect />
     <h1>3. Component Lifecycle</h1>
     <hr />
-    <!-- <LifecycleParent />
+    <LifecycleParent />
     <h1>4. Props & Emits</h1>
     <hr />
     <PropsEmitsParent />
@@ -47,7 +47,7 @@ import WatchersWatchEffect from './components/practices/composition/WatchersWatc
     <hr />
     <SlotDefaultParent />
     <SlotNamedParent />
-    <SlotScopedParent /> -->
+    <SlotScopedParent />
   </div>
 </template>
 

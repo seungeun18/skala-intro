@@ -58,19 +58,31 @@ import SlotScopedParent from '@/components/practices/component/SlotScopedParent.
 -->
 
 <script setup>
-// 새로 만든 WeatherParent 컴포넌트 불러오기
+import WeatherMockup from './components/exercise/WeatherMockup.vue'
+import WeatherComposition from './components/exercise/WeatherComposition.vue'
 import WeatherParent from './components/exercise/WeatherParent.vue'
+import UnitToggler from './components/exercise/UnitToggler.vue'
 </script>
 
 <template>
-  <main>
-    <!-- 화면에 컴포넌트 띄우기 -->
+  <div class="app-container">
+    <h1>⛅ 과제 1: 날씨 (Mockup)</h1>
+    <hr />
+    <WeatherMockup />
+  </div>
+  <div class="app-container">
+    <h1>⛅ 과제 2: 날씨 (컴포지션)</h1>
+    <hr />
+    <WeatherComposition />
+  </div>
+  <div class="app-container">
+    <h1>⛅ 과제 3: 날씨 (컴포넌트)</h1>
+    <hr />
     <WeatherParent />
-  </main>
+  </div>
 </template>
 
-<style scoped>
-main {
-  padding: 20px;
-}
+<style>
+/* ⚠️ 외부 스타일 파일(예: 버튼 디자인 뭉치)을 이 방 안으로 쏙 가리켜 가져옵니다 */
+@import '@/assets/exercise.css';
 </style>

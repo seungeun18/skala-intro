@@ -32,3 +32,4 @@ export function useWeatherSearch(initialList) {
     filteredWeatherList,
   }
 }
+//weatherparent.vue 파일 안에 화면을 만드는 코드와 검색/필터링하는 js코드가 다 섞여서 코드가 길고 지저분했는데 computed,watch만 뽑아서 js파일로 이동시킴

@@ -71,7 +71,7 @@ const handleClickDetail = (city) => {
 
 .footer-msg {
   background-color: #e6fcf5;
-  border: 1px solid #20c997;
+  border: 1px solid rgb(158, 156, 211);
   color: #099268;
   padding: 12px;
   border-radius: 6px;

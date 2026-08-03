@@ -42,3 +42,6 @@ npm run build
 ```sh
 npm run lint
 ```
+
+<img width="897" height="730" alt="image" src="https://github.com/user-attachments/assets/802cdb77-af76-4792-b1ec-bfe48fe20d88" />
+

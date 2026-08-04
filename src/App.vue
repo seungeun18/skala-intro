@@ -1,4 +1,4 @@
-<!-- <script setup>
+<script setup>
 import WeatherMockup from './components/exercise/WeatherMockup.vue'
 import WeatherComposition from './components/exercise/WeatherComposition.vue'
 import WeatherParent from './components/exercise/WeatherParent.vue'
@@ -40,7 +40,7 @@ import UnitToggler from './components/exercise/UnitToggler.vue'
       </main>
     </div>
   </div>
-   <div class="app-container">
+  <div class="app-container">
     <h1>⛅ 과제 5: 스토어적용</h1>
     <hr />
     <div class="dashboard-wrapper">
@@ -54,14 +54,15 @@ import UnitToggler from './components/exercise/UnitToggler.vue'
         <RouterView />
       </main>
     </div>
-  </div> 
+  </div>
 </template>
 
 <style>
 /* ⚠️ 외부 스타일 파일(예: 버튼 디자인 뭉치)을 이 방 안으로 쏙 가리켜 가져옵니다 */
 @import '@/assets/exercise.css';
-</style> -->
+</style>
 
+<!--
 <script setup>
 import StoreCounter from './components/practices/library/StoreCounter.vue'
 // import AxiosWeather from './components/practices/library/AxiosWeather.vue'
@@ -91,4 +92,5 @@ import StoreCounter from './components/practices/library/StoreCounter.vue'
 <style>
 /* ⚠️ 외부 스타일 파일(예: 버튼 디자인 뭉치)을 이 방 안으로 쏙 가리켜 가져옵니다 */
 @import '@/assets/practice.css';
-</style>
+</style> 
+-->

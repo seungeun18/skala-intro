@@ -4,11 +4,23 @@
       <div class="city-info">
         <strong>{{ city.name }}</strong> ({{ city.weather }})
         <div class="temp">현재 기온: {{ city.temp }}°C</div>
-        <span class="tag" :class="city.status === '더움' ? 'hot' : 'cool'">
+        <div
+          class="tag"
+          :class="{
+            hot: city.status === '더움',
+            superhot: city.status === '폭염',
+            cool: city.status === '선선함',
+          }"
+        >
           {{ city.status }}
-        </span>
+        </div>
       </div>
-      <button class="detail-btn" @click.stop="emit('click-detail', city)">상세보기</button>
+
+      <!-- 🚀 Named Slot: 부모가 바꾼 커스텀 버튼이 들어오는 영역 -->
+      <slot name="detail" :city="city">
+        <!-- 부모가 슬롯을 안 채웠을 때 뜰 기본 버튼 -->
+        <button class="detail-btn" @click.stop="emit('click-detail', city)">상세보기</button>
+      </slot>
     </div>
   </div>
 </template>
@@ -61,6 +73,10 @@ const emit = defineEmits(['select-card', 'click-detail'])
 
 .tag.hot {
   background-color: #ff6b6b;
+}
+
+.tag.superhot {
+  background-color: #d00000;
 }
 
 .tag.cool {

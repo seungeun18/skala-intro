@@ -1,6 +1,6 @@
 # skala-vue
 커스터마이징
-1. 자음만 검색해도 항목이 나오도록 수정
+1. 자음만 검색해도 항목이 나오도록 수정 <br>
 WeatherParent.vue 파일의 filteredCities 계산 속성(computed)을 수정할 때, 초성 추출 함수    (getInitialConsonants)로 추출한 도시 이름의 초성 문자열이 사용자가 입력한 자음 검색어로 시작하는지(startsWith) 검사하여 첫 글자 자음이 일치하는 도시만 필터링하도록 변경했습니다.
 2. 상세보기 버튼 튜닝하기
 WeatherCard.vue 파일의 기존 <button>을 부모 데이터(:city)를 전달하는 Named & Scoped Slot(name="detail")으로 감싸고, WeatherParent.vue 파일에서 <template #detail>을 사용해 클릭 이벤트(handleClickDetail)가 연결된 커스텀 민트색 버튼으로 대체했습니다.

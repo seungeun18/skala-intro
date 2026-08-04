@@ -1,98 +1,58 @@
-<template>
-  <div class="weather-card" @click="emit('select-card', city)">
-    <div class="card-header">
-      <div class="city-info">
-        <strong>{{ city.name }}</strong> ({{ city.weather }})
-        <div class="temp">현재 기온: {{ city.temp }}°C</div>
-        <div
-          class="tag"
-          :class="{
-            hot: city.status === '더움',
-            superhot: city.status === '폭염',
-            cool: city.status === '선선함',
-          }"
-        >
-          {{ city.status }}
-        </div>
-      </div>
-
-      <!-- 🚀 Named Slot: 부모가 바꾼 커스텀 버튼이 들어오는 영역 -->
-      <slot name="detail" :city="city">
-        <!-- 부모가 슬롯을 안 채웠을 때 뜰 기본 버튼 -->
-        <button class="detail-btn" @click.stop="emit('click-detail', city)">상세보기</button>
-      </slot>
-    </div>
-  </div>
-</template>
-
 <script setup>
+// 1. 상위로부터 단방향 주입받을 객체 데이터 규격 검수 (매크로)
 defineProps({
-  city: {
+  cityItem: {
     type: Object,
     required: true,
   },
 })
 
+// 2. 상위로 송신할 두 가지 경로의 커스텀 이벤트 식별자 등록 (매크로)
 const emit = defineEmits(['select-card', 'click-detail'])
 </script>
 
+<template>
+  <div class="weather-card" @click="emit('select-card', `${cityItem.name}이 선택되었습니다.`)">
+    <h4>{{ cityItem.name }} ({{ cityItem.status }})</h4>
+    <p>현재 기온: {{ cityItem.temp }}°C</p>
+
+    <span v-if="cityItem.temp >= 25" class="badge hot">🔥 더움</span>
+    <span v-else class="badge cool">❄️ 선선함</span>
+
+    <button class="btn-detail" @click.stop="emit('click-detail', cityItem.name, cityItem.status)">
+      상세보기
+    </button>
+  </div>
+</template>
+
 <style scoped>
 .weather-card {
-  border: 1px solid #eee;
-  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #dee2e6;
   padding: 12px;
   margin-bottom: 10px;
-  background-color: #fafafa;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  position: relative;
 }
-
-.weather-card:hover {
-  background-color: #f0f0f0;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.temp {
-  margin: 4px 0;
-  font-size: 0.9rem;
-  color: #555;
-}
-
-.tag {
+.badge {
   display: inline-block;
-  padding: 2px 6px;
-  font-size: 0.75rem;
+  padding: 4px 8px;
+  font-size: 12px;
   border-radius: 4px;
   color: #fff;
 }
-
-.tag.hot {
-  background-color: #ff6b6b;
+.hot {
+  background-color: #ff7675;
 }
-
-.tag.superhot {
-  background-color: #d00000;
+.cool {
+  background-color: #74b9ff;
 }
-
-.tag.cool {
-  background-color: #4dabf7;
-}
-
-.detail-btn {
+.btn-detail {
+  position: absolute;
+  right: 12px;
+  top: 15px;
   padding: 6px 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #fff;
   cursor: pointer;
-  font-size: 0.8rem;
-}
-
-.detail-btn:hover {
-  background-color: #e9ecef;
 }
 </style>

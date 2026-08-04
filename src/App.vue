@@ -32,11 +32,11 @@ import UnitToggler from './components/exercise/UnitToggler.vue'
       </nav>
       <main>
         <RouterView />
-        <RouterView v-slot="{ Component }">
+        <!-- <RouterView v-slot="{ Component }">
           <KeepAlive>
             <component :is="Component" />
           </KeepAlive>
-        </RouterView>
+        </RouterView> -->
       </main>
     </div>
   </div>
@@ -92,5 +92,5 @@ import StoreCounter from './components/practices/library/StoreCounter.vue'
 <style>
 /* ⚠️ 외부 스타일 파일(예: 버튼 디자인 뭉치)을 이 방 안으로 쏙 가리켜 가져옵니다 */
 @import '@/assets/practice.css';
-</style> 
+</style>
 -->

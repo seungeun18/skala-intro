@@ -24,10 +24,11 @@ const BASE_URL = 'https://api.openweathermap.org/data/2.5/weather'
 const fetchRealTimeWeather = async () => {
   isLoading.value = true
   try {
-    const [seoulRes, suwonRes, busanRes] = await Promise.all([
+    const [seoulRes, suwonRes, busanRes, yangsanRes] = await Promise.all([
       axios.get(`${BASE_URL}?q=Seoul&appid=${API_KEY}&units=metric&lang=kr`),
       axios.get(`${BASE_URL}?q=Suwon&appid=${API_KEY}&units=metric&lang=kr`),
       axios.get(`${BASE_URL}?q=Busan&appid=${API_KEY}&units=metric&lang=kr`),
+      axios.get(`${BASE_URL}?q=Yangsan&appid=${API_KEY}&units=metric&lang=kr`),
     ])
 
     // 기존 자식 컴포넌트(WeatherCard)가 요구하는 프로퍼티 규격에 맞춰 JSON 알맹이 맵핑
@@ -49,6 +50,12 @@ const fetchRealTimeWeather = async () => {
         name: '부산',
         temp: busanRes.data.main.temp,
         status: busanRes.data.weather[0].description,
+      },
+      {
+        id: 'city_04',
+        name: '양산',
+        temp: yangsanRes.data.main.temp,
+        status: yangsanRes.data.weather[0].description,
       },
     ]
     console.log('🟢 [API 통신 완료] 메인 대시보드 실시간 기상 장부 동기화:', weatherList.value)

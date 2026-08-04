@@ -1,9 +1,13 @@
 # skala-vue
-<img width="897" height="730" alt="image" src="https://github.com/user-attachments/assets/802cdb77-af76-4792-b1ec-bfe48fe20d88" />
+커스터마이징
+1. 자음만 검색해도 항목이 나오도록 수정
+WeatherParent.vue 파일의 filteredCities 계산 속성(computed)을 수정할 때, 초성 추출 함수    (getInitialConsonants)로 추출한 도시 이름의 초성 문자열이 사용자가 입력한 자음 검색어로 시작하는지(startsWith) 검사하여 첫 글자 자음이 일치하는 도시만 필터링하도록 변경했습니다.
+2. 상세보기 버튼 튜닝하기
+WeatherCard.vue 파일의 기존 <button>을 부모 데이터(:city)를 전달하는 Named & Scoped Slot(name="detail")으로 감싸고, WeatherParent.vue 파일에서 <template #detail>을 사용해 클릭 이벤트(handleClickDetail)가 연결된 커스텀 민트색 버튼으로 대체했습니다.
+3. filteredWeatherList 관련 로직(computed + watch)을 useWeatherSearch() Composable로 추출하여 재사용
+WeatherParent.vue 파일에 화면 렌더링 코드와 검색·필터링 로직이 섞여 있던 구조를 개편하여, computed(필터링)와 watch / watchEffect(감시자) 로직을 독립된 useWeatherSearch() Composable JS 파일로 추출해 외부에서 필요한 상태값만 반환받아 사용하도록 깔끔하게 분리했습니다.
 
-<img width="888" height="738" alt="image" src="https://github.com/user-attachments/assets/ae1def1e-08c4-4e58-a3a0-2fcb03f169de" />
-
-<img width="890" height="895" alt="image" src="https://github.com/user-attachments/assets/97469682-0d0a-4e8c-b198-43e2994dc830" />
+<img width="663" height="734" alt="image" src="https://github.com/user-attachments/assets/24d90b9f-4817-405a-839e-4e2151e3b263" />
 
 
 This template should help get you started developing with Vue 3 in Vite.

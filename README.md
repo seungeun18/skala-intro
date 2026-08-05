@@ -21,6 +21,45 @@
 
 ---
 
+### 세부 기능
+
+| 번호 | 세부 기능                    | 구현 방식                                                                                                                                                  |
+| ---- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1-1  | 나라 선택 그리드             | 나라 목록을 6개씩 잘라 `visibleCountries` computed로 노출, 버튼 클릭 시 `selectCountry()`로 선택 나라 변경                                                 |
+| 1-2  | 도시 날씨 일괄 조회          | 선택 나라의 도시들을 `Promise.allSettled`로 병렬 호출 — 일부 도시 실패해도 나머지는 정상 표시                                                              |
+| 1-3  | 도시 카드 → 상세 이동        | 카드 클릭 시 `router.push(`/weather/${city.id}`)`로 상세 페이지 이동                                                                                       |
+| 2-1  | 동적 라우트 파라미터 검증    | `/weather/region/:countryCode(KR\|JP\|CN)` — 라우트 정의에 정규식을 넣어 KR/JP/CN 외 값은 아예 매칭 안 되게 제한                                           |
+| 2-2  | 지역별 도시 일괄 조회        | `REGION_QUERIES` 매핑 객체에서 국가코드로 도시 목록을 찾아 `Promise.all`로 전체 병렬 호출 (전부 성공 필요)                                                 |
+| 2-3  | 잘못된 국가코드 방어         | 매핑에 없는 국가코드 진입 시 `router.replace('/')`로 홈으로 리다이렉트                                                                                     |
+| 3-1  | 한/영 데이터 동시 조회       | 화면 표시용(한국어)과 Wikivoyage 검색용(영어) 응답을 `Promise.all`로 동시에 요청해 왕복 시간 단축                                                          |
+| 3-2  | 도시 현지 시각 계산          | `dt`(UTC 유닉스 시각) + `timezone`(초 단위 오프셋)을 더한 뒤 `Intl.DateTimeFormat('ko-KR')`으로 포맷                                                       |
+| 3-3  | 풍속 단위 변환               | 섭씨/화씨 설정에 따라 `m/s`(원본) ↔ `mph`(×2.237) 자동 전환                                                                                                |
+| 4-1  | 날씨 조건별 준비물 분기      | `weather[0].main` 값이 `Rain/Drizzle/Snow`인지에 따라 우산·방수신발 등 다른 준비물·활동 추천                                                               |
+| 4-2  | 고온/저온 주의사항           | 기온 28도 이상이면 자외선차단제·수분보충 안내, 10도 이하면 보온 옷차림 안내를 `caution` 배열에 push                                                        |
+| 4-3  | 강풍/저시정 주의사항         | 풍속 10m/s 이상이면 강풍 주의, 가시거리 5km 미만이면 시야 주의 문구 추가                                                                                   |
+| 4-4  | 실시간 반영                  | 위 로직 전체를 `computed(travelGuide)`로 구성해 날씨 데이터가 갱신되면 가이드도 자동 재계산                                                                |
+| 5-1  | Wikivoyage 문서 검색         | 영문 도시명으로 Wikivoyage `action=query&list=search` API 호출해 가장 관련도 높은 문서 제목 1개 획득                                                       |
+| 5-2  | 문서 HTML 파싱               | `action=parse`로 렌더링된 HTML을 받아 `DOMParser`로 파싱, `h2/h3` 헤딩 기준으로 개요·역사·볼거리 섹션 텍스트 추출                                          |
+| 5-3  | 한국어 자동 번역             | **MyMemory 번역 API**(무료, API 키 불필요)로 개요·역사·볼거리 텍스트를 `Promise.all`로 병렬 번역, 실패 시 원문(영어) 그대로 표시                           |
+| 5-4  | 텍스트 정제 & 말줄임         | `compactText()`로 공백 정리 후 지정 길이 초과 시 `…` 처리 (카드용 340자, 볼거리 항목용 90자)                                                               |
+| 5-5  | 카드 클램프 & 전체보기 모달  | 카드 안에서는 CSS `-webkit-line-clamp: 5`로 5줄까지만 노출, "더보기" 클릭 시 `Teleport to="body"`로 렌더링되는 모달에서 전체 텍스트 확인                   |
+| 6-1  | 도시 검색 필터링             | 입력한 검색어(소문자 변환)로 `weatherList`를 `filter()`하는 `filteredCities` computed                                                                      |
+| 6-2  | 나라/도시 목록 페이지네이션  | `PAGE_SIZE = 6` 기준으로 `slice()`해 현재 페이지 항목만 노출, 이전/다음 버튼으로 페이지 이동                                                               |
+| 6-3  | 검색어 변경 시 페이지 초기화 | `watch(searchQuery, () => cityPage.value = 1)`로 검색할 때마다 1페이지로 리셋                                                                              |
+| 6-4  | 페이지 범위 자동 보정        | `watch(cityPageCount, ...)`로 필터링 결과가 줄어 현재 페이지가 범위를 벗어나면 마지막 페이지로 보정                                                        |
+| 7-1  | 전역 단위 상태               | Pinia `configStore.unit` (`celsius`/`fahrenheit`)을 여러 페이지에서 `useConfigStore()`로 공유                                                              |
+| 7-2  | 온도 변환 계산               | `isFahrenheit`이면 `(celsius * 9) / 5 + 32` 공식으로 변환 후 반올림해 표시                                                                                 |
+| 7-3  | 단위 전환 UI                 | `UnitToggler.vue` 컴포넌트에서 스토어 상태를 변경 → 모든 화면의 온도·풍속 표시가 즉시 함께 바뀜                                                            |
+| 8-1  | 선택 나라 URL 반영           | `watch(selectedCode, code => router.replace({ query: { ...route.query, country: code } }))`로 새로고침해도 선택 유지                                       |
+| 8-2  | 진입 시 URL에서 상태 복원    | `onMounted`에서 `route.query.country` 값이 유효한 나라 코드면 `selectedCode` 초기값으로 반영 (딥링크 지원)                                                 |
+| 9-1  | 최고/최저 기온 계산          | `[...weatherList.value].sort((a, b) => b.temp - a.temp)[0]`로 정렬 후 첫 항목을 최고/최저 도시로 추출 (원본 배열 훼손 방지를 위해 스프레드로 복사 후 정렬) |
+| 9-2  | 공통 패턴 재사용             | 동일한 계산 로직이 `WeatherHomeView`와 `WeatherRegionView` 양쪽에 각각 computed로 구현되어 있음                                                            |
+| 10-1 | 모달 오픈/클로즈 상태        | `isWikiModalOpen` ref + `openWikiModal()`/`closeWikiModal()` 함수로 제어                                                                                   |
+| 10-2 | 배경 클릭 시 닫기            | 오버레이에 `@click.self="closeWikiModal"` — 오버레이 자체를 클릭했을 때만 닫히고, 모달 내부 클릭은 전파되지 않음                                           |
+| 10-3 | 레이아웃 영향 없는 렌더링    | `<Teleport to="body">`로 모달을 컴포넌트 트리 바깥(`body` 최상단)에 렌더링해 부모의 `overflow`/`z-index` 제약을 우회                                       |
+
+---
+
 ## 2. 기술 스택
 
 - **Vue 3** (Composition API, `<script setup>`)

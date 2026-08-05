@@ -15,6 +15,12 @@ const PAGE_SIZE = 6
 // 위치를 요청하기 위한 데이터입니다. 날씨 이름·온도·상태는 API 응답값만 사용합니다.
 const COUNTRIES = [
   {
+    code: 'KR',
+    label: '대한민국',
+    flag: '🇰🇷',
+    cities: ['Seoul,KR', 'Busan,KR', 'Jeju City,KR', 'Gyeongju,KR', 'Gangneung,KR', 'Incheon,KR'],
+  },
+  {
     code: 'JP',
     label: '일본',
     flag: '🇯🇵',
@@ -99,6 +105,19 @@ const COUNTRIES = [
     label: '호주',
     flag: '🇦🇺',
     cities: ['Sydney,AU', 'Melbourne,AU', 'Brisbane,AU', 'Perth,AU', 'Cairns,AU', 'Gold Coast,AU'],
+  },
+  {
+    code: 'RU',
+    label: '러시아',
+    flag: '🇷🇺',
+    cities: [
+      'Moscow,RU',
+      'Saint Petersburg,RU',
+      'Vladivostok,RU',
+      'Irkutsk,RU',
+      'Kazan,RU',
+      'Sochi,RU',
+    ],
   },
 ]
 

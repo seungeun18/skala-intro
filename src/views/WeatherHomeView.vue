@@ -1,4 +1,6 @@
 <script setup>
+// ===== 대시보드 홈 페이지 =====
+// 나라 선택(STEP 1) → 도시별 실시간 날씨 조회(STEP 2) → 상세 페이지 이동 흐름의 메인 화면
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
@@ -7,12 +9,13 @@ import UnitToggler from '../components/exercise/UnitToggler.vue'
 
 const route = useRoute()
 const router = useRouter()
-const configStore = useConfigStore()
+const configStore = useConfigStore() // 섭씨/화씨 단위 설정 전역 스토어
 const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY
 const BASE_URL = 'https://api.openweathermap.org/data/2.5/weather'
-const PAGE_SIZE = 6
+const PAGE_SIZE = 6 // 나라 목록 / 도시 목록 공통 페이지당 개수
 
 // 위치를 요청하기 위한 데이터입니다. 날씨 이름·온도·상태는 API 응답값만 사용합니다.
+// 나라별 코드/라벨/국기 이모지/조회할 도시 목록(OpenWeather 쿼리 형식)
 const COUNTRIES = [
   {
     code: 'KR',
@@ -121,21 +124,25 @@ const COUNTRIES = [
   },
 ]
 
-const selectedCode = ref('JP')
-const countryPage = ref(1)
-const cityPage = ref(1)
-const searchQuery = ref('')
-const weatherList = ref([])
+// ----- 상태 값 -----
+const selectedCode = ref('JP') // 현재 선택된 나라 코드 (기본: 일본)
+const countryPage = ref(1) // 나라 목록 페이지 번호
+const cityPage = ref(1) // 도시 목록 페이지 번호
+const searchQuery = ref('') // 도시 검색어
+const weatherList = ref([]) // 선택된 나라의 도시별 날씨 목록
 const isLoading = ref(false)
 const errorMessage = ref('')
 
+// ----- 계산 값 -----
 const selectedCountry = computed(
   () => COUNTRIES.find((country) => country.code === selectedCode.value) ?? COUNTRIES[0],
 )
 const countryPageCount = computed(() => Math.ceil(COUNTRIES.length / PAGE_SIZE))
+// 현재 페이지에 보여줄 나라 목록 (페이지네이션)
 const visibleCountries = computed(() =>
   COUNTRIES.slice((countryPage.value - 1) * PAGE_SIZE, countryPage.value * PAGE_SIZE),
 )
+// 검색어로 필터링된 도시 목록
 const filteredCities = computed(() => {
   const keyword = searchQuery.value.trim().toLocaleLowerCase()
   return keyword
@@ -145,17 +152,23 @@ const filteredCities = computed(() => {
 const cityPageCount = computed(() =>
   Math.max(1, Math.ceil(filteredCities.value.length / PAGE_SIZE)),
 )
+// 현재 페이지에 보여줄 도시 목록 (검색 결과 기준 페이지네이션)
 const visibleCities = computed(() =>
   filteredCities.value.slice((cityPage.value - 1) * PAGE_SIZE, cityPage.value * PAGE_SIZE),
 )
+// 조회된 도시 중 가장 덥고/추운 도시 (요약 카드용)
 const hottestCity = computed(() => [...weatherList.value].sort((a, b) => b.temp - a.temp)[0])
 const coldestCity = computed(() => [...weatherList.value].sort((a, b) => a.temp - b.temp)[0])
+
+// ----- 단위 변환 & 표시 포맷 -----
 const isFahrenheit = computed(() => configStore.unit === 'fahrenheit')
 const unitSymbol = computed(() => configStore.unitSymbol ?? (isFahrenheit.value ? '°F' : '°C'))
 const displayTemp = (temp) =>
   temp === undefined ? '–' : Math.round(isFahrenheit.value ? (temp * 9) / 5 + 32 : temp)
 const iconUrl = (icon) => (icon ? `https://openweathermap.org/img/wn/${icon}@2x.png` : '')
 
+// ----- 선택 나라의 도시별 날씨 일괄 조회 -----
+// 일부 도시 조회가 실패해도 나머지는 정상 표시되도록 allSettled 사용
 async function loadCountryWeather() {
   if (!API_KEY) {
     errorMessage.value = 'VITE_OPENWEATHER_API_KEY가 설정되지 않았습니다.'
@@ -188,42 +201,55 @@ async function loadCountryWeather() {
     isLoading.value = false
   }
 }
+
+// 나라 선택 → 도시 페이지/검색어 초기화 후 재조회
 function selectCountry(code) {
   selectedCode.value = code
   cityPage.value = 1
   searchQuery.value = ''
   loadCountryWeather()
 }
+// 나라 목록 페이지 이동 (범위 밖으로 못 나가게 clamp)
 function changeCountryPage(offset) {
   countryPage.value = Math.min(countryPageCount.value, Math.max(1, countryPage.value + offset))
 }
+// 도시 목록 페이지 이동
 function changeCityPage(offset) {
   cityPage.value = Math.min(cityPageCount.value, Math.max(1, cityPage.value + offset))
 }
+// 도시 카드 클릭 → 상세 페이지 이동
 function openDetail(id) {
   router.push(`/weather/${id}`)
 }
+
+// 검색어 바뀌면 도시 페이지 1로 리셋
 watch(searchQuery, () => {
   cityPage.value = 1
 })
+// 검색 결과로 전체 페이지 수가 줄어들면 현재 페이지 보정
 watch(cityPageCount, (count) => {
   if (cityPage.value > count) cityPage.value = count
 })
+// 초기 진입 시 쿼리스트링의 country 값으로 선택 나라 복원 (딥링크 지원)
 onMounted(() => {
   const routeCountry = String(route.query.country || '').toUpperCase()
   if (COUNTRIES.some((country) => country.code === routeCountry)) selectedCode.value = routeCountry
   loadCountryWeather()
 })
+// 선택 나라가 바뀔 때마다 URL 쿼리스트링에 반영 (새로고침/공유 시 상태 유지)
 watch(selectedCode, (code) => router.replace({ query: { ...route.query, country: code } }))
 </script>
 
 <template>
   <div class="weather-page">
+    <!-- 페이지 소개 -->
     <section class="intro">
       <p class="eyebrow">TRAVEL WEATHER</p>
       <h1>여행지 날씨를 미리 살펴보세요</h1>
       <p>선택한 나라의 주요 도시 관측 정보를 실시간으로 불러옵니다.</p>
     </section>
+
+    <!-- STEP 1: 나라 선택 (페이지네이션) -->
     <section class="panel country-panel">
       <div class="section-title">
         <div>
@@ -251,6 +277,8 @@ watch(selectedCode, (code) => router.replace({ query: { ...route.query, country:
         </button>
       </div>
     </section>
+
+    <!-- STEP 2 헤더: 선택된 나라 표시 + 새로고침 -->
     <section class="city-heading">
       <div>
         <p class="label">STEP 2</p>
@@ -261,6 +289,8 @@ watch(selectedCode, (code) => router.replace({ query: { ...route.query, country:
         {{ isLoading ? '불러오는 중' : '새로고침' }}
       </button>
     </section>
+
+    <!-- 최고/최저 기온 도시 요약 카드 -->
     <section class="extreme-grid">
       <article class="extreme-card warm">
         <span>현재 가장 더운 도시</span><strong>{{ hottestCity?.name ?? '집계 중' }}</strong
@@ -273,6 +303,8 @@ watch(selectedCode, (code) => router.replace({ query: { ...route.query, country:
         ><small>{{ coldestCity?.status }}</small>
       </article>
     </section>
+
+    <!-- STEP 2 본문: 검색 + 단위 토글 + 도시 카드 목록 (페이지네이션) -->
     <section class="panel city-panel">
       <div class="city-tools">
         <label class="search-box"
@@ -315,6 +347,7 @@ watch(selectedCode, (code) => router.replace({ query: { ...route.query, country:
   gap: 18px;
   padding-top: 20px;
 }
+/* 페이지 소개 영역 */
 .intro {
   padding: 20px 4px 6px;
 }
@@ -341,6 +374,7 @@ watch(selectedCode, (code) => router.replace({ query: { ...route.query, country:
   margin: 9px 0 0;
   color: #7890a1;
 }
+/* 카드형 패널 공통 스타일 */
 .panel {
   padding: 24px;
   border: 1px solid #dfebf2;
@@ -356,6 +390,7 @@ watch(selectedCode, (code) => router.replace({ query: { ...route.query, country:
   justify-content: space-between;
   gap: 16px;
 }
+/* 페이지네이션 컨트롤 */
 .pager {
   display: flex;
   align-items: center;
@@ -378,6 +413,7 @@ watch(selectedCode, (code) => router.replace({ query: { ...route.query, country:
   opacity: 0.4;
   cursor: not-allowed;
 }
+/* 나라 선택 버튼 그리드 */
 .country-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -431,6 +467,7 @@ watch(selectedCode, (code) => router.replace({ query: { ...route.query, country:
   opacity: 0.65;
   cursor: wait;
 }
+/* 최고/최저 기온 요약 카드 */
 .extreme-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -463,6 +500,7 @@ watch(selectedCode, (code) => router.replace({ query: { ...route.query, country:
   font-size: 1.9rem;
   letter-spacing: -0.06em;
 }
+/* 도시 목록 패널 */
 .city-panel {
   display: grid;
   gap: 20px;
@@ -554,6 +592,7 @@ watch(selectedCode, (code) => router.replace({ query: { ...route.query, country:
 .error {
   color: #bd3b4a;
 }
+/* 태블릿 대응 */
 @media (max-width: 680px) {
   .country-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -573,6 +612,7 @@ watch(selectedCode, (code) => router.replace({ query: { ...route.query, country:
     grid-template-columns: 1fr;
   }
 }
+/* 모바일 대응 */
 @media (max-width: 400px) {
   .panel {
     padding: 18px;

@@ -2,8 +2,6 @@
 
 여행지의 실시간 날씨를 조회하고, 날씨 기반 여행 가이드와 Wikivoyage 도시 정보를 함께 보여주는 Vue 3 애플리케이션입니다.
 
-이 프로젝트 하나에 **Vue 3 Composition API의 핵심 개념들이 거의 다 들어있습니다.** 아래 README는 "무엇을 만들었는가"와 "Vue의 어떤 개념으로 만들었는가"를 함께 정리했습니다.
-
 ---
 
 ## 1. 주요 기능
@@ -68,7 +66,7 @@ routes: [
 ]
 ```
 
-### 여기서 배울 수 있는 Vue Router 개념
+### Vue Router 개념
 
 - **정적 임포트 vs 지연 로딩(lazy loading)**: 홈 화면(`WeatherHomeView`)만 정적으로 import하고, 나머지는 `() => import(...)` 형태의 **동적 임포트**로 처리해 초기 번들 크기를 줄입니다. 사용자가 실제로 그 페이지에 진입할 때만 해당 청크(chunk)가 로드됩니다.
 - **동적 라우트 파라미터 + 정규식 제약**: `:countryCode(KR|JP|CN)`처럼 괄호 안에 정규식을 넣어 URL 파라미터 값을 KR/JP/CN 중 하나로만 제한할 수 있습니다. 이 외의 값이 들어오면 라우트가 매칭되지 않습니다.
@@ -78,7 +76,7 @@ routes: [
 
 ---
 
-## 5. 이 프로젝트로 배우는 Vue 3 핵심 개념
+## 5. Vue 3 핵심 개념
 
 ### 5-1. `<script setup>` + Composition API
 
@@ -234,21 +232,18 @@ Wikivoyage API가 돌려주는 HTML 문자열을 브라우저 내장 `DOMParser`
 
 ---
 
-## 6. 참고 사항 / 다음 단계 정리 시 확인하면 좋은 부분
-
-아래 파일들은 이번에 함께 검토하지 못했습니다. README에 컴포넌트 구조를 더 정확히 남기고 싶다면 이 파일들도 확인해서 보완하는 것을 추천합니다.
-
-- `stores/configStore.js` — 단위 상태를 `ref`/`reactive` 중 무엇으로 관리하는지, `unitSymbol`을 getter로 두는지 등
-- `components/exercise/UnitToggler.vue` — 스토어 상태를 어떻게 변경하는지 (버튼 클릭 → store 액션 호출 패턴 확인 가능)
-- `components/exercise/WeatherCard.vue`, `BaseDashboardCard.vue` — props 정의(`defineProps`)와 emit 정의(`defineEmits`) 방식
-- `views/NotFoundView.vue`
-
 ---
 
-## 7. 환경 변수
+### 트러블슈팅 / 문제 해결 기록 (Troubleshooting)
 
-```
-VITE_OPENWEATHER_API_KEY=발급받은_API_키
-```
+```markdown
+## 트러블슈팅 (Troubleshooting)
 
-`import.meta.env.VITE_OPENWEATHER_API_KEY`로 접근하며, `.env` 파일에 `VITE_` 접두사가 붙은 변수만 Vite 빌드에 노출됩니다.
+### GitHub API Key 노출 감지 에러 해결
+
+- **문제**: API Key 하드코딩 시 GitHub Security Check(Secret Scanning)에 의해 커밋 거부 및 보안 위반 에러 발생.
+- **해결**:
+  1. `.env` 환경 변수 관리 체계 도입 (`VITE_OPENWEATHER_API_KEY`).
+  2. `.gitignore`에 환경 변수 파일 포함시켜 Git 추적 제외.
+  3. Vercel 대시보드의 `Environment Variables` 세팅에 키를 등록하여 배포 환경 구축 및 보안 문제 해결.
+```

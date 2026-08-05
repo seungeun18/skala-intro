@@ -58,7 +58,7 @@
   padding: 34px;
   border-radius: 24px;
   color: #fff;
-  background: linear-gradient(135deg, #2b809e, #70c2d1);
+  background: linear-gradient(135deg, #4aa3d8, #cfeff9);
 }
 .about-hero p {
   margin: 0 0 8px;

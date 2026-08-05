@@ -152,21 +152,45 @@ const getSectionText = (document, names) => {
 }
 
 // "See/Sights/Attractions" 섹션에서 볼거리 목록 추출 (최대 4개)
-const getSightNames = (document) => {
-  const headings = [...document.querySelectorAll('h2, h3')]
+// "See/Sights/Attractions" 섹션에서 소제목(카테고리) + 요약 문단을 추출
+// 예: "Palaces, shrines, and walls of Joseon Dynasty — 경복궁, 창덕궁 등 조선왕조..."
+// 소제목 없이 <li> 목록만 있는 문서는 항목을 그대로 사용 (fallback)
+const getSightEntries = (document) => {
+  const headings = [...document.querySelectorAll('h2')]
   const heading = headings.find((item) =>
     ['see', 'sights', 'attractions'].includes(item.textContent.trim().toLowerCase()),
   )
   if (!heading) return []
-  const names = []
+
+  const entries = []
   let node = heading.nextElementSibling
-  while (node && !/^H[23]$/.test(node.tagName) && names.length < 4) {
-    if (node.matches?.('li')) names.push(compactText(node.textContent, 90))
+  let currentTitle = ''
+  let currentParts = []
+
+  const pushCurrent = () => {
+    if (!currentTitle) return
+    const summary = compactText(currentParts.join(' '), 90)
+    entries.push(summary ? `${currentTitle} — ${summary}` : currentTitle)
+  }
+
+  while (node && node.tagName !== 'H2') {
+    if (node.tagName === 'H3' || node.tagName === 'H4') {
+      // 새 소제목(카테고리) 시작 → 이전 카테고리 내용 저장
+      pushCurrent()
+      currentTitle = node.textContent.trim()
+      currentParts = []
+    } else if (currentTitle && node.matches?.('p, ul')) {
+      currentParts.push(node.textContent)
+    } else if (!currentTitle && node.matches?.('li')) {
+      // 소제목 없이 목록만 있는 문서 대비
+      entries.push(compactText(node.textContent, 90))
+    }
     node = node.nextElementSibling
   }
-  return names
-}
+  pushCurrent()
 
+  return entries.slice(0, 6)
+}
 // ----- 번역 -----
 // 영어 텍스트 → 한국어 번역 (MyMemory 무료 API, API 키 불필요)
 // 요청 실패 시 원문(영어)을 그대로 반환해 화면 공백 방지
@@ -224,7 +248,7 @@ const fetchWikivoyageGuide = async () => {
     const overviewEn = compactText(paragraphs[0] ?? '') // 첫 단락 = 도시 개요
     const historyEn =
       getSectionText(document, ['history', 'understand']) || compactText(paragraphs[1] ?? '')
-    const sightsEn = getSightNames(document)
+    const sightsEn = getSightEntries(document)
     const url = `https://en.wikivoyage.org/wiki/${encodeURIComponent(pageTitle.replaceAll(' ', '_'))}`
 
     // 개요/역사/볼거리 텍스트 병렬 번역
